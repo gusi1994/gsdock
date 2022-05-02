@@ -13,15 +13,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: docker login
+    - name: Docker Login
+      uses: docker/login-action@v1.14.1
       env:
-        DOCKER_USER: '${{secrets.DOCKER_USER}}'
-        DOCKER_PASSWORD: '${{secrets.DOCKER_PASSWORD}}'
-      run: |
-        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag gmrizzo/gsdock:$(date +%s)
-
-    - name: Docker Push
-      run: docker push ${{secrets.DOCKER_USER}}/gsdock
+          DOCKER_USER: '${{secrets.DOCKER_USER}}'
+          DOCKER_PASSWORD: '${{secrets.DOCKER_PASSWORD}}'
+      with:
+        username: $DOCKER_USER
+        password: $DOCKER_PASSWORD
+    - uses: docker/build-push-action@v2.10.0
+      env:
+          DOCKER_USER: '${{secrets.DOCKER_USER}}'
+          DOCKER_PASSWORD: '${{secrets.DOCKER_PASSWORD}}'
+      with:
+        push: true
+        tags: '${{secrets.DOCKER_USER}}/gsdock:latest'  
